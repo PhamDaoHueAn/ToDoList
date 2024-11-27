@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Todo List</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="box" id="heading">
+        <h1><%= listTitle %></h1>
+    </div>
+
+    <div class="box">
+        <% listArray.forEach((item) => { %>
+            <div class="item">
+                <input type="checkbox" id="<%= item._id %>">
+                <p class="task-text"><%= item.name %></p>
+                <div class="item-buttons">
+                    <button class="edit-btn" onclick="editItem('<%= item._id %>', '<%= item.name %>')">
+                        ✏️
+                    </button>
+                    <button class="delete-btn" onclick="deleteItem('<%= item._id %>')">
+                        🗑️
+                    </button>
+                </div>
+            </div>
+        <% }); %>
+
+        <form class="item" action="/" method="post">
+            <input type="text" name="newItem" id="newItemInput" placeholder="Thêm việc cần làm..." autocomplete="off">
+            <button type="submit" class="add-btn">+</button>
+        </form>
+    </div>
+
+    <!-- Modal cho chức năng sửa -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h2>Sửa công việc</h2>
+            <form id="editForm" action="/edit" method="post">
+                <input type="hidden" id="editItemId" name="itemId">
+                <input type="text" id="editItemText" name="newName" autocomplete="off">
+                <div class="modal-buttons">
+                    <button type="submit">Lưu</button>
+                    <button type="button" onclick="closeModal()">Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function editItem(id, text) {
+            document.getElementById('editModal').style.display = 'block';
+            document.getElementById('editItemId').value = id;
+            document.getElementById('editItemText').value = text;
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        function deleteItem(id) {
+            if (confirm('Bạn có chắc muốn xóa công việc này?')) {
+                fetch('/delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ itemId: id })
+                }).then(() => {
+                    window.location.reload();
+                });
+            }
+        }
+    </script>
+</body>
+</html>
